@@ -19,6 +19,7 @@ dependencies = [
 [project.scripts]
 legendary-broker = "legendary_broker.cli:main"
 legendary-validate-bars = "legendary_broker.data:main"
+legendary-model = "legendary_broker.models:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

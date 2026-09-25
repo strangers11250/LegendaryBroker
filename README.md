@@ -12,17 +12,18 @@ Required CSV columns:
 date,symbol,open,high,low,close,volume
 ```
 
-Run the validator from the repository root after installing the package:
+Run the validator from the repository root in PowerShell:
 
 ```powershell
-pip install -e .
-legendary-validate-bars .\your_daily_bars.csv
+$env:PYTHONPATH = ".\src"
+& ".\.venv\Scripts\python.exe" -m legendary_broker.data .\your_daily_bars.csv
 ```
 
 Or run the tests using the project environment:
 
 ```powershell
-python -m unittest discover -s tests -v
+$env:PYTHONPATH = ".\src"
+& ".\.venv\Scripts\python.exe" -m unittest discover -s tests -v
 ```
 
 For the optional data adapter, set `ALPACA_API_KEY` and `ALPACA_API_SECRET` in the process environment or in the local ignored `.env` file. Environment variables take precedence. Use separate paper credentials and never commit them. The adapter is read-only and requests adjusted daily bars.
@@ -53,3 +54,16 @@ Run all module checks with:
 ```powershell
 python -m unittest discover -s tests -v
 ```
+
+## Module 3: prediction models
+
+The initial estimators are standardized Ridge regression and scikit-learn's histogram gradient boosted tree. `predict_as_of` fits only on observations before the requested date whose `label_end_date` has already arrived. This purges overlapping forward labels from training. The feature pipeline stores that label end date specifically for this check.
+
+Generate periodic out-of-sample predictions from a feature CSV:
+
+```powershell
+$env:PYTHONPATH = ".\src"
+& ".\.venv\Scripts\python.exe" -m legendary_broker.models .\features.csv --model ridge --step-days 5 --min-train-rows 200
+```
+
+The command writes prediction rows and reports MAE, RMSE, and mean daily cross-sectional rank IC. These are research diagnostics; they are not a claim of live performance. Both feature extraction and model fitting accept provider-neutral tabular data.

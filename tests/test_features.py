@@ -29,6 +29,7 @@ class FeaturePipelineTests(unittest.TestCase):
                                 bars[(bars.symbol == "SPY")].iloc[70].close - 1))
         self.assertTrue(all(name in result.columns for name in FEATURES))
         self.assertTrue(result[(result.symbol == "AAA")].tail(5).forward_excess.isna().all())
+        self.assertTrue(result[(result.symbol == "AAA")].tail(5).label_end_date.isna().all())
 
     def test_future_price_change_does_not_change_past_features(self):
         bars = synthetic_bars()

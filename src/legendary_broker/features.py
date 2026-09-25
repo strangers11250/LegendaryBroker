@@ -18,7 +18,8 @@ def make_features(bars: pd.DataFrame, benchmark: str = "SPY", horizon: int = 5) 
     The output row at date ``t`` uses closes and volume at or before ``t`` for its
     features. ``forward_excess`` is the security's close-to-close return over the
     next ``horizon`` observed bars minus the benchmark return over the same dates.
-    The last ``horizon`` observations for each symbol have a missing label.
+    ``label_end_date`` records when that label becomes observable so model fitting
+    can purge labels that overlap a validation or prediction date.
     """
     missing = BAR_COLUMNS - set(bars.columns)
     if missing:
@@ -61,6 +62,7 @@ def make_features(bars: pd.DataFrame, benchmark: str = "SPY", horizon: int = 5) 
         future_asset = close.shift(-horizon).div(close).sub(1)
         future_benchmark = g.date.map(benchmark_forward)
         g["forward_excess"] = future_asset - future_benchmark
+        g["label_end_date"] = g.date.shift(-horizon)
         pieces.append(g)
 
     return pd.concat(pieces, ignore_index=True).replace([np.inf, -np.inf], np.nan)
