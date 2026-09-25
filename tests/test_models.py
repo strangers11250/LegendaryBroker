@@ -46,6 +46,23 @@ class ModelTests(unittest.TestCase):
                 self.assertEqual(len(prediction), 4)
                 self.assertTrue(np.isfinite(prediction.prediction).all())
 
+    def test_momentum_rule_is_relative_20_session_return(self):
+        frame = model_frame()
+        as_of = pd.bdate_range("2025-01-01", periods=100)[-1]
+        prediction = predict_as_of(frame, as_of, model_name="momentum", min_train_rows=100)
+        current = frame[frame.date == as_of].set_index("symbol")
+        expected = current.ret_20 - current.market_ret_20
+        actual = prediction.set_index("symbol").prediction
+        pd.testing.assert_series_equal(actual.sort_index(), expected.sort_index(),
+                                       check_names=False)
+
+    def test_momentum_rule_does_not_require_labeled_training_history(self):
+        frame = model_frame()
+        as_of = frame.date.min()
+        prediction = predict_as_of(frame, as_of, model_name="momentum", min_train_rows=100)
+        self.assertEqual(prediction.training_rows.iloc[0], 0)
+        self.assertTrue(np.isfinite(prediction.prediction).all())
+
     def test_walk_forward_predictions_are_out_of_sample(self):
         frame = model_frame()
         predictions = walk_forward_predictions(

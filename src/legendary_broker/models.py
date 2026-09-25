@@ -17,7 +17,7 @@ from sklearn.preprocessing import StandardScaler
 from .features import FEATURES
 
 REQUIRED = {"date", "label_end_date", "symbol", "forward_excess", *FEATURES}
-MODEL_NAMES = {"ridge", "boosted_tree"}
+MODEL_NAMES = {"ridge", "boosted_tree", "momentum"}
 
 
 class InsufficientTrainingData(ValueError):
@@ -37,7 +37,9 @@ def _normalize_dates(frame: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_model(name: str = "ridge"):
-    """Build a model pipeline; imputation/scaling are fitted on training rows only."""
+    """Build an estimator; the momentum baseline is a transparent rule instead."""
+    if name == "momentum":
+        raise ValueError("The momentum rule does not fit a scikit-learn estimator")
     if name == "ridge":
         return make_pipeline(
             SimpleImputer(strategy="median"), StandardScaler(), Ridge(alpha=10.0)
@@ -71,13 +73,17 @@ def predict_as_of(
     current = data.loc[data.date == date].copy()
     if current.empty:
         raise ValueError(f"No feature rows found for prediction date {date.date()}")
-    if len(train) < min_train_rows:
+    if model_name != "momentum" and len(train) < min_train_rows:
         raise InsufficientTrainingData(
             f"Need {min_train_rows} matured training rows before {date.date()}; found {len(train)}"
         )
-    estimator = build_model(model_name)
-    estimator.fit(train[FEATURES], train.forward_excess.clip(-0.5, 0.5))
-    current["prediction"] = estimator.predict(current[FEATURES])
+    if model_name == "momentum":
+        # Transparent zero-fit benchmark: 20-session security return less market return.
+        current["prediction"] = current.ret_20 - current.market_ret_20
+    else:
+        estimator = build_model(model_name)
+        estimator.fit(train[FEATURES], train.forward_excess.clip(-0.5, 0.5))
+        current["prediction"] = estimator.predict(current[FEATURES])
     current["model"] = model_name
     current["training_rows"] = len(train)
     current["training_end_date"] = train.label_end_date.max()

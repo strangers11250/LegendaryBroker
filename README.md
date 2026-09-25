@@ -57,13 +57,13 @@ python -m unittest discover -s tests -v
 
 ## Module 3: prediction models
 
-The initial estimators are standardized Ridge regression and scikit-learn's histogram gradient boosted tree. `predict_as_of` fits only on observations before the requested date whose `label_end_date` has already arrived. This purges overlapping forward labels from training. The feature pipeline stores that label end date specifically for this check.
+The initial model candidates are standardized Ridge regression, scikit-learn's histogram gradient boosted tree, and a simple 20-session relative-momentum rule. The momentum rule scores each asset as its 20-session return minus the benchmark's 20-session return. `predict_as_of` fits learned estimators only on observations before the requested date whose `label_end_date` has already arrived. This purges overlapping forward labels from training. The feature pipeline stores that label end date specifically for this check.
 
 Generate periodic out-of-sample predictions from a feature CSV:
 
 ```powershell
 $env:PYTHONPATH = ".\src"
-& ".\.venv\Scripts\python.exe" -m legendary_broker.models .\features.csv --model ridge --step-days 5 --min-train-rows 200
+& ".\.venv\Scripts\python.exe" -m legendary_broker.models .\features.csv --model momentum --step-days 5 --min-train-rows 200
 ```
 
-The command writes prediction rows and reports MAE, RMSE, and mean daily cross-sectional rank IC. These are research diagnostics; they are not a claim of live performance. Both feature extraction and model fitting accept provider-neutral tabular data.
+The command writes prediction rows and reports MAE, RMSE, and mean daily cross-sectional rank IC. The momentum rule emits an uncalibrated ranking score, so interpret its absolute-error metrics as diagnostic only and compare its rank IC/portfolio results with learned models. These are research diagnostics; they are not a claim of live performance. Both feature extraction and model fitting accept provider-neutral tabular data.
