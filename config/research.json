@@ -1,0 +1,17 @@
+{
+  "capital": 3000,
+  "symbols": ["SPY", "QQQ", "IWM", "DIA", "XLK", "XLF", "XLE", "XLV", "XLI", "XLP", "XLY", "XLB", "XLU", "TLT", "IEF", "GLD", "SHY", "VNQ", "EFA", "EEM"],
+  "benchmark": "SPY",
+  "horizon_days": 5,
+  "rebalance_every_days": 5,
+  "max_weight": 0.10,
+  "max_gross_exposure": 0.95,
+  "max_sector_exposure": 0.30,
+  "cash_floor": 0.05,
+  "max_turnover": 0.50,
+  "commission_bps": 1.0,
+  "slippage_bps": 5.0,
+  "risk_lookback_days": 20,
+  "min_history_days": 126,
+  "data_timezone": "America/New_York"
+}
