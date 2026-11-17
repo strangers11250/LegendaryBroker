@@ -23,3 +23,5 @@
 - Hardened post-reload readiness to tolerate Nginx worker handoff and verify full
   public HTTPS behavior; corrected first-install rollback ordering for service links.
 - Made CI rerun release directories unique and refused overwriting prior releases.
+- Activated production CI/CD and deployed successfully; confirmed 8,785 real stored
+  bars, six-hour refresh, HTTPS behavior and unchanged original server features.

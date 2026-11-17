@@ -45,16 +45,16 @@ restores the pinned frontend version after cloning/pulling.
 | `/etc/legendary-market/api.env` | Optional non-secret API feed override, e.g. `BROKER_FEED=iex` |
 | `/opt/legendary-market/backups/<timestamp>` | Pre-deployment SQLite/config snapshots and probe logs |
 
-Production services are `legendary-market-api` (loopback8765) and
+Production services are `legendary-market-api` (loopback port 8765) and
 `legendary-market-ingest` (independent polling loop). Both run as `legendary-market`.
 Existing Nginx HTTPS site `my-https` gains only a market-owned include routing
 `/web/` and `/api/`. The HTTP listener, original `/` welcome page, TLS configuration,
 and `discord-bot.service` are preserved. CPU and memory caps accommodate the
-existing roughly1GB host. No Node process is required on the host.
+existing roughly 1 GB host. No Node process is required on the host.
 
 Change `interval_hours` (0.25–8760, fractional hours allowed) in the server's
-ingestion.json. The worker reloads it within30seconds, including during its wait.
-Defaults:6hours,1827history days. Environment variables override JSON; changing
+ingestion.json. The worker reloads it within 30 seconds, including during its wait.
+Defaults: 6 hours, 1827 history days. Environment variables override JSON; changing
 environment requires restarting the worker. Changing symbols/history takes effect
 at the next scheduled fetch. Change feed in both worker config and API `api.env`,
 then restart both services. Different feeds are retained separately and never mixed.
@@ -77,7 +77,7 @@ fallback silently switches feed. Last good data remains available on refresh fai
 All backend tests, frontend tests/typecheck/build and real-provider preflight must
 pass before initial deployment. Subsequent CI releases use the same verified build
 artifact. The installer additionally probes an isolated scratch database and built
-webpage on loopback18765 before changing production. It backs up active SQLite
+webpage on loopback port 18765 before changing production. It backs up active SQLite
 using its online backup API, swaps only the market release, checks API readiness
 and a successful worker refresh, validates Nginx, gracefully reloads Nginx, verifies
 HTTPS endpoints and confirms Discord's PID and unit file remain unchanged.
@@ -94,8 +94,8 @@ sudo tar -xzf /tmp/market-release.tar.gz -C /opt/legendary-market/releases/RELEA
 sudo bash /opt/legendary-market/releases/RELEASE_ID/deploy/install-release.sh /opt/legendary-market/releases/RELEASE_ID
 ```
 
-For first provision, create `/etc/legendary-market` mode0755, store credential
-environment file mode0600, and copy config/ingestion.json there. Transfer credentials
+For first provision, create `/etc/legendary-market` mode 0755, store credential
+environment file mode 0600, and copy config/ingestion.json there. Transfer credentials
 over authenticated SSH stdin; never paste them into a command line or logs. Ensure
 `python3-venv`, curl, Nginx, CA certificates and flock exist. Existing TLS certificate
 renewal remains the operator's current setup.

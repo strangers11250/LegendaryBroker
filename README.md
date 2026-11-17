@@ -9,6 +9,10 @@ them periodically, and serves a React/TypeScript dashboard at `/web/` with read-
 FastAPI lookups at `/api/`. Default benchmark cards use labeled SPY/QQQ/DIA/IWM ETF
 proxies. Search covers the configured stored stock universe.
 
+Live: [market dashboard](https://13.184.199.172/web/) ·
+[API health](https://13.184.199.172/api/health) ·
+[ingestion status](https://13.184.199.172/api/status).
+
 Start with [operations and local setup](docs/OPERATIONS.md). The explicit contracts
 are [storage](docs/STORAGE.md), [API](docs/API.md), and [security](docs/SECURITY.md).
 See [change history](CHANGELOG.md) and [verification](docs/VERIFICATION.md).
