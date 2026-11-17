@@ -2,6 +2,18 @@
 
 Research-first quantitative portfolio tooling. Work is delivered in modules so each piece can be reviewed before we add the next layer.
 
+## Market database and dashboard
+
+The market platform stores completed, adjusted daily Alpaca bars in SQLite, refreshes
+them periodically, and serves a React/TypeScript dashboard at `/web/` with read-only
+FastAPI lookups at `/api/`. Default benchmark cards use labeled SPY/QQQ/DIA/IWM ETF
+proxies. Search covers the configured stored stock universe.
+
+Start with [operations and local setup](docs/OPERATIONS.md). The explicit contracts
+are [storage](docs/STORAGE.md), [API](docs/API.md), and [security](docs/SECURITY.md).
+See [change history](CHANGELOG.md) and [verification](docs/VERIFICATION.md).
+Clone using `git clone --recurse-submodules` to include the separately versioned `web` repository.
+
 ## Module 1: daily market data
 
 The first module validates and normalizes daily OHLCV bars, reads CSV or Parquet, checks freshness against an operator-supplied expected session date, and offers an optional Alpaca historical bars adapter. It never calls brokerage order endpoints.

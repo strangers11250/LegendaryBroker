@@ -1,0 +1,6 @@
+# Small production runtime; research dependencies remain in pyproject.toml.
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+pandas>=2.2,<3
+numpy>=2,<3
+tzdata>=2025.1

@@ -1,0 +1,28 @@
+[Unit]
+Description=LegendaryBroker read-only market API
+After=network.target
+
+[Service]
+Type=simple
+User=legendary-market
+Group=legendary-market
+WorkingDirectory=/opt/legendary-market/current
+Environment=PYTHONPATH=/opt/legendary-market/current/src
+Environment=BROKER_DB_PATH=/var/lib/legendary-market/market.sqlite3
+Environment=BROKER_FEED=sip
+EnvironmentFile=-/etc/legendary-market/api.env
+Environment=BROKER_WEB_DIR=/opt/legendary-market/current/web/dist
+ExecStart=/opt/legendary-market/current/.venv/bin/python -m uvicorn legendary_broker.api:app --host 127.0.0.1 --port 8765 --workers 1 --proxy-headers --forwarded-allow-ips 127.0.0.1 --no-server-header
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/legendary-market
+UMask=0027
+MemoryMax=180M
+CPUQuota=40%
+
+[Install]
+WantedBy=multi-user.target

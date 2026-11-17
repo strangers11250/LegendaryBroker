@@ -1,0 +1,27 @@
+[Unit]
+Description=LegendaryBroker scheduled read-only Alpaca ingestion
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=legendary-market
+Group=legendary-market
+WorkingDirectory=/opt/legendary-market/current
+Environment=PYTHONPATH=/opt/legendary-market/current/src
+Environment=BROKER_DB_PATH=/var/lib/legendary-market/market.sqlite3
+EnvironmentFile=/etc/legendary-market/market.env
+ExecStart=/opt/legendary-market/current/.venv/bin/python -m legendary_broker.ingestion --config /etc/legendary-market/ingestion.json
+Restart=on-failure
+RestartSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/legendary-market
+UMask=0027
+MemoryMax=200M
+CPUQuota=40%
+
+[Install]
+WantedBy=multi-user.target

@@ -10,3 +10,8 @@ data/metadata/**
 models/**
 logs/**
 !.gitkeep
+/web/**
+data/*.sqlite3*
+data/*.lock
+dist/
+*.log

@@ -1,0 +1,6 @@
+{
+  "interval_hours": 6,
+  "symbols": ["SPY", "QQQ", "DIA", "IWM", "AAPL", "MSFT", "NVDA"],
+  "feed": "sip",
+  "history_days": 1827
+}
