@@ -20,3 +20,5 @@
 - Added storage/API/security/operations documentation. Existing validators, feature
   engineering, prediction models, Parquet behavior and Discord service are preserved.
 - Validation and final deployment evidence are recorded in docs/VERIFICATION.md.
+- Hardened post-reload readiness to tolerate Nginx worker handoff and verify full
+  public HTTPS behavior; corrected first-install rollback ordering for service links.

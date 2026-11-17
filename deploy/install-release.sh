@@ -30,6 +30,9 @@ rollback() {
     if [ -n "$probe_pid" ]; then kill "$probe_pid" 2>/dev/null || true; fi
     if [ "$rc" -ne 0 ] && [ "$switched" -eq 1 ]; then
         systemctl stop legendary-market-api legendary-market-ingest || true
+        if [ -z "$previous" ]; then
+            systemctl disable legendary-market-api legendary-market-ingest || true
+        fi
         cp -a "$backup/nginx-site" "$site"
         for file in "${managed_files[@]}"; do
             saved="$backup/$(basename "$file")"
@@ -40,7 +43,6 @@ rollback() {
             ln -sfn "$previous" /opt/legendary-market/current
             systemctl restart legendary-market-api legendary-market-ingest || true
         else
-            systemctl disable --now legendary-market-api legendary-market-ingest || true
             if [ -L /opt/legendary-market/current ]; then unlink /opt/legendary-market/current; fi
         fi
         nginx -t && systemctl reload nginx || true
@@ -114,8 +116,12 @@ for attempt in $(seq 1 60); do
 done
 curl -fsS http://127.0.0.1:8765/api/status | check_fresh_status
 systemctl reload nginx
-curl -fsS https://13.184.199.172/api/health
-curl -fsS https://13.184.199.172/web/ >/dev/null
+# Reload returns before old workers have drained. Probe new routing until ready.
+for attempt in $(seq 1 30); do
+    if curl -fsS https://13.184.199.172/api/health >/dev/null && curl -fsS https://13.184.199.172/web/ >/dev/null; then break; fi
+    sleep 1
+done
+"$candidate/.venv/bin/python" "$candidate/deploy/verify_http.py" --base https://13.184.199.172
 test "$(systemctl show discord-bot -p MainPID --value)" = "$bot_before"
 cmp /etc/systemd/system/discord-bot.service "$backup/discord-unit"
 echo "Deployed $candidate; rollback snapshot $backup"

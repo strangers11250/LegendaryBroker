@@ -35,3 +35,10 @@ submodule checkout without an additional repository credential.
 Production environment, dedicated restricted CI SSH identity, verified host-key
 secret and deployment variables are configured. Provider credentials exist only on
 the server. Production rollout results are appended after they are observed.
+
+The first production attempt (run44003329085) passed verification, scratch-DB smoke,
+live ingestion and localhost API readiness. Its immediate HTTPS check received404
+during graceful Nginx reload. Automatic rollback restored original routing and stopped
+only market services. Discord PID532, its unit file and welcome-page checksum were
+unchanged. The installer now waits for new HTTPS routing and runs the full HTTP smoke
+before declaring success; initial rollback also removes enable symlinks before units.
