@@ -94,7 +94,7 @@ sudo tar -xzf /tmp/market-release.tar.gz -C /opt/legendary-market/releases/RELEA
 sudo bash /opt/legendary-market/releases/RELEASE_ID/deploy/install-release.sh /opt/legendary-market/releases/RELEASE_ID
 ```
 
-For first provision, create `/etc/legendary-market` mode0700, store credential
+For first provision, create `/etc/legendary-market` mode0755, store credential
 environment file mode0600, and copy config/ingestion.json there. Transfer credentials
 over authenticated SSH stdin; never paste them into a command line or logs. Ensure
 `python3-venv`, curl, Nginx, CA certificates and flock exist. Existing TLS certificate
@@ -129,6 +129,9 @@ public key on the deployment account. That account must have sudo privileges for
 the installer. Credentials and environment settings cannot be activated without a
 GitHub account session; creating workflow YAML alone does not configure them.
 Main pushes deploy only when the enable variable is true and verification passes.
+Documentation-only pushes skip this workflow. The configured dedicated CI public
+key uses OpenSSH `restrict` to disable PTY, forwarding and agent forwarding. It
+still permits deployment commands; treat the production environment as privileged.
 
 References: [FastAPI HTTPS proxy](https://fastapi.tiangolo.com/deployment/https/),
 [Uvicorn proxy trust settings](https://uvicorn.dev/settings/), and

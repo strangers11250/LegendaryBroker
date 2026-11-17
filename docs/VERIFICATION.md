@@ -25,4 +25,13 @@
   `9c25dfdcffe9f15d72856704e04f24185f580201eff1935ecd42fe8e9c73bf5e`.
 - Existing Nginx syntax check passed before changes.
 
-Production rollout results and GitHub CI activation are appended after they are observed.
+## GitHub verification
+
+Ubuntu/Python3.12/Node22 workflow [44002739494](https://github.com/strangers11250/LegendaryBroker/actions/runs/44002739494)
+passed backend tests, frontend checks, built-app HTTP smoke and artifact packaging
+for backend4a62875/frontend3eed81d. Frontend repository is public, allowing pinned
+submodule checkout without an additional repository credential.
+
+Production environment, dedicated restricted CI SSH identity, verified host-key
+secret and deployment variables are configured. Provider credentials exist only on
+the server. Production rollout results are appended after they are observed.

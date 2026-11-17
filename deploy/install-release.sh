@@ -97,6 +97,7 @@ PY
 nginx -t
 systemctl daemon-reload
 systemctl enable legendary-market-api legendary-market-ingest
+restart_epoch=$(date -u +%s)
 systemctl restart legendary-market-api legendary-market-ingest
 for attempt in $(seq 1 30); do
     if curl -fsS http://127.0.0.1:8765/api/health >/dev/null; then break; fi
@@ -104,11 +105,14 @@ for attempt in $(seq 1 30); do
 done
 curl -fsS http://127.0.0.1:8765/api/health
 # A successful live provider fetch is required before publishing this candidate.
+check_fresh_status() {
+    python3 -c 'import json,sys; from datetime import datetime; d=json.load(sys.stdin); success=d.get("last_success"); sys.exit(0 if success and datetime.fromisoformat(success.replace("Z","+00:00")).timestamp() >= int(sys.argv[1]) and not d.get("last_error") and not d.get("running") else 1)' "$restart_epoch"
+}
 for attempt in $(seq 1 60); do
-    if curl -fsS http://127.0.0.1:8765/api/status | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get("last_success") and not d.get("last_error") and not d.get("running") else 1)'; then break; fi
+    if curl -fsS http://127.0.0.1:8765/api/status | check_fresh_status; then break; fi
     sleep 2
 done
-curl -fsS http://127.0.0.1:8765/api/status | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d.get("last_success") and not d.get("last_error") and not d.get("running"), "Provider fetch did not succeed"'
+curl -fsS http://127.0.0.1:8765/api/status | check_fresh_status
 systemctl reload nginx
 curl -fsS https://13.184.199.172/api/health
 curl -fsS https://13.184.199.172/web/ >/dev/null
