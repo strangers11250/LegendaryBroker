@@ -113,6 +113,8 @@ It installs locked Python/npm dependencies, tests backend/frontend, typechecks,
 builds and packages an allowlisted archive. The artifact excludes `.env`, private
 keys, databases, node_modules and Git metadata. `release.json` records both commits.
 Deploy jobs consume that exact build artifact rather than rebuilding on the server.
+Release IDs include the commit, run ID and attempt number; reruns create distinct
+directories and refuse to overwrite an existing release.
 
 Create a GitHub `production` environment with appropriate protection. Set repository
 or environment variables:

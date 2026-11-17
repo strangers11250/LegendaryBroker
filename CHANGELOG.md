@@ -22,3 +22,4 @@
 - Validation and final deployment evidence are recorded in docs/VERIFICATION.md.
 - Hardened post-reload readiness to tolerate Nginx worker handoff and verify full
   public HTTPS behavior; corrected first-install rollback ordering for service links.
+- Made CI rerun release directories unique and refused overwriting prior releases.

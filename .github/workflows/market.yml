@@ -78,13 +78,13 @@ jobs:
         env:
           DEPLOY_HOST: ${{ vars.MARKET_DEPLOY_HOST }}
           DEPLOY_USER: ${{ vars.MARKET_DEPLOY_USER }}
-          RELEASE_ID: ${{ github.sha }}-${{ github.run_id }}
+          RELEASE_ID: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           set -euo pipefail
           [[ "$DEPLOY_HOST" =~ ^[A-Za-z0-9.-]+$ ]]
           [[ "$DEPLOY_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
           scp -i ~/.ssh/market_deploy -o BatchMode=yes market-release.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:/tmp/market-$RELEASE_ID.tar.gz"
-          ssh -i ~/.ssh/market_deploy -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" "set -eu; release=/opt/legendary-market/releases/$RELEASE_ID; sudo mkdir -p \"\$release\"; sudo tar -xzf /tmp/market-$RELEASE_ID.tar.gz -C \"\$release\"; sudo bash \"\$release/deploy/install-release.sh\" \"\$release\""
+          ssh -i ~/.ssh/market_deploy -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" "set -eu; release=/opt/legendary-market/releases/$RELEASE_ID; sudo mkdir -p /opt/legendary-market/releases; sudo mkdir \"\$release\"; sudo tar -xzf /tmp/market-$RELEASE_ID.tar.gz -C \"\$release\"; sudo bash \"\$release/deploy/install-release.sh\" \"\$release\""
       - name: Remove temporary deployment identity
         if: always()
         run: rm -f ~/.ssh/market_deploy
